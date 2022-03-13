@@ -14,7 +14,7 @@ jobs:
     resources:
       instance-type: C4
   StyleGan2:
-    uses: script@v1
+    uses: container@v1
     with:
       image: 'tensorflow/tensorflow:1.14.0-gpu-py3'
     needs:
