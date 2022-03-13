@@ -19,7 +19,7 @@ jobs:
       image: 'tensorflow/tensorflow:1.14.0-gpu-py3'
     needs:
       - CloneRepo
-      # - UpdateTest
+      - UpdateTest
     inputs:
       stylegan2: CloneRepo.outputs.stylegan2
     outputs:
@@ -29,24 +29,24 @@ jobs:
           ref: demo-dataset
     resources:
       instance-type: P4000
-  # UpdateTest:
-  #   uses: script@v1
-  #   with:
-  #     image: 'bash:5'
-  #     script: |-
-  #       echo "This is a test"
-  #       echo "Test test" > /outputs/generatedTest/test123.txt
-  #   needs:
-  #     - CloneRepo
-  #   inputs:
-  #     stylegan2: CloneRepo.outputs.stylegan2
-  #   outputs:
-  #     generatedTest:
-  #       type: dataset
-  #       with:
-  #         ref: demo-dataset
-  #   resources:
-  #     instance-type: C4
+  UpdateTest:
+    uses: script@v1
+    with:
+      image: 'bash:5'
+      script: |-
+        echo "This is a test"
+        echo "Test test" > /outputs/generatedTest/test123.txt
+    needs:
+      - CloneRepo
+    inputs:
+      stylegan2: CloneRepo.outputs.stylegan2
+    outputs:
+      generatedTest:
+        type: dataset
+        with:
+          ref: demo-dataset
+    resources:
+      instance-type: C4
 context:
   event:
     github:
