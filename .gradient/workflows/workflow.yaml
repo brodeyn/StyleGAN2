@@ -4,23 +4,51 @@
       only: main
 jobs:
   CloneRepo:
-    resources:
-      instance-type: C5
-    outputs:
-      repo:
-        type: volume
     uses: git-checkout@v1
     with:
+      ref: context.event.github.ref
       url: context.event.github.url
-  HelloWorld:
+    outputs:
+      stylegan2:
+        type: volume
     resources:
-      instance-type: C5
+      instance-type: C4
+  StyleGan2:
+    uses: script@v1
+    with:
+      image: 'tensorflow/tensorflow:1.14.0-gpu-py3'
+    needs:
+      - CloneRepo
+      - UpdateTest
+    inputs:
+      stylegan2: CloneRepo.outputs.stylegan2
+    outputs:
+      generatedFaces:
+        type: dataset
+        with:
+          ref: demo-dataset
+    resources:
+      instance-type: P4000
+  UpdateTest:
+    uses: script@v1
+    with:
+      image: 'bash:5'
+      script: |-
+        echo "This is a test"
+        echo "Test test" > /outputs/generatedTest/test123.txt
     needs:
       - CloneRepo
     inputs:
-      repo: CloneRepo.outputs.repo
-    uses: script@v1
-    with:
-      script: |-
-        exit 1
-      image: tensorflow/tensorflow:1.14.0-py3
+      stylegan2: CloneRepo.outputs.stylegan2
+    outputs:
+      generatedTest:
+        type: dataset
+        with:
+          ref: demo-dataset
+    resources:
+      instance-type: C4
+context:
+  event:
+    github:
+      ref: e1b7016905c753d0f8baedf1e35cf8fde38bdf54
+      url: 'https://github.com/flexthink/paperspace-speechbrain'
